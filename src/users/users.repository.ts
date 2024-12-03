@@ -15,11 +15,8 @@ export class UserRepository {
   }): Promise<User> {
     const createdUser = new this.userModel(userData);
     try {
-      console.log('hereeee in repo');
       return await createdUser.save();
     } catch (error: any) {
-      console.log('error-----------', error);
-
       // Catch validation errors (e.g., password validation)
       if (error.name === 'ValidationError') {
         // If password validation fails, extract the error message

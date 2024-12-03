@@ -1,14 +1,31 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
-import * as dotenv from 'dotenv';
 import { HelmetMiddleware } from '@nest-middlewares/helmet';
-dotenv.config();
+import * as Joi from 'joi'; // For environment variable validation
 
 @Module({
   imports: [
-    MongooseModule.forRoot(process.env.DATATBASE_URL),
+    // ConfigModule for environment variables
+    ConfigModule.forRoot({
+      isGlobal: true, // Makes ConfigModule available across the entire app
+      envFilePath: '.env', // Path to the .env file
+      validationSchema: Joi.object({
+        DATABASE_URL: Joi.string().uri().required(), // Validation for DATABASE_URL
+      }),
+    }),
+
+    // MongooseModule with ConfigService to dynamically load the database URL
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get<string>('DATABASE_URL'), // Fetch DATABASE_URL from environment variables
+      }),
+      inject: [ConfigService],
+    }),
+
     AuthModule,
     UsersModule,
   ],
@@ -17,6 +34,6 @@ dotenv.config();
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(HelmetMiddleware).forRoutes('*'); // Apply to all routes
+    consumer.apply(HelmetMiddleware).forRoutes('*'); // Apply Helmet middleware to all routes
   }
 }
