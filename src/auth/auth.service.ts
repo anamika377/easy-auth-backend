@@ -39,7 +39,6 @@ export class AuthService {
     });
 
     // Remove password field from the user object before returning it
-    //const { password: _, ...userWithoutPassword } = user.toObject(); // Destructure and exclude password
     const userWithoutPassword = removeSensitiveFields(user);
 
     return {

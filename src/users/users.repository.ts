@@ -39,7 +39,7 @@ export class UserRepository {
       // Handle duplicate email error (MongoDB error code)
       if (error.code === 11000) {
         throw new HttpException(
-          { message: 'Duplicate Email, please use some other one.' },
+          { message: 'Duplicate Email, please use some other email.' },
           HttpStatus.BAD_REQUEST,
         );
       }
