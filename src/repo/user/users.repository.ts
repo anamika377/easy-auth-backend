@@ -1,18 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User } from './schema/users.schema';
+import { User } from '../../users/schema/users.schema';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { SignUpDto } from 'src/auth/dto/signUp.dto';
 
 @Injectable()
 export class UserRepository {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
-  async createUser(userData: {
-    email: string;
-    name: string;
-    password: string;
-  }): Promise<User> {
+  async createUser(userData: SignUpDto): Promise<User> {
+    console.log(userData);
     const createdUser = new this.userModel(userData);
     try {
       return await createdUser.save();

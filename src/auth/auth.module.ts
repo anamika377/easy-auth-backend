@@ -6,15 +6,20 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UsersModule } from 'src/users/users.module';
 import { WinstonLoggerService } from 'src/common/logger/winston-logger.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 dotnev.config();
 @Module({
   imports: [
     UsersModule,
     PassportModule,
-    JwtModule.register({
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '1h' },
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: { expiresIn: '1h' },
+      }),
+      inject: [ConfigService],
     }),
   ],
   controllers: [AuthController],
