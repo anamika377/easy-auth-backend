@@ -29,7 +29,6 @@ export class AuthService {
         'Password must be at least 8 characters long, contain at least one letter, one number, and one special character.',
       );
     }
-    console.log('input', input);
 
     // Create the user with the hashed password
     const user = await this.userService.createUser(input);
